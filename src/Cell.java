@@ -3,85 +3,60 @@
  */
 public class Cell {
 
-    private int[] possibilities;
-    private int numpos;
-    private int val;
+    public enum ship {
+        YES,
+        NO,
+        NOT_SURE
+    };
+
+    private ship shipStatus;
     private int row, col;
 
-    public Cell(int row, int col, int[] possibilities, int val, int numpos){
+    public Cell(int row, int col){
+        this(row, col, ship.NOT_SURE);
+    }
+
+    public Cell(int row, int col, ship shipStatus){
         this.row = row;
         this.col = col;
-        this.numpos = numpos;
-        this.val = val;
-        this.possibilities = possibilities;
+        this.shipStatus = shipStatus;
     }
 
-    public Cell(int row, int col, int s){
-
-        this.possibilities = new int[s];
-        this.row = row;
-        this.col = col;
-
-        for (int i=0;i<s;i++)
-            this.possibilities[i] = i+1;
-        this.numpos = s;
-        this.val = 0;
+    /**
+     * Denote that their is a piece of ship in this cell
+     */
+    public void setShip(){
+        shipStatus = ship.YES;
     }
 
-    public int setVal(int val){
+    /**
+     * Removes the possibility that this cell has a piece of a ship in it
+     */
+    public void notShip(){
 
-        if (possibilities[val-1] == 0)
-            return -1;
-        if (this.val == val){
-            return 1;
-        }
-        possibilities = new int[possibilities.length];
-        possibilities[val-1] = val;
-        numpos = 1;
-        this.val = val;
-        return 0;
+        shipStatus = ship.NO;
     }
 
-    public int getVal(){
-        return this.val;
-    }
-
-    public int not(int possibility, Grid g){
-
-        if (val == 0 && possibilities[possibility - 1] != 0) {
-            possibilities[possibility - 1] = 0;
-            numpos--;
-
-            if (numpos == 1) {
-                for (int p : possibilities)
-                    if (p != 0)
-                        return g.setCellVal(row, col, p);
-            }
-
-            return g.checkRowCol(row, col, possibility);
-        }
-        return 0;
-    }
-
-    public boolean filled(){
-        return val != 0;
+    /**
+     * Check if this ship has a piece in it or not
+     * @return
+     */
+    public ship getShipStatus(){
+        return shipStatus;
     }
 
     public String toString() {
-        String str = "| ";
-        for (int i : possibilities) {
-            str += i + " ";
-        }
-        return str + "|";
-//        return val+"";
-    }
+        String shipStr = shipStatus == ship.NOT_SURE ? "   " :
+                shipStatus == ship.NO ? " . " : " O ";
 
-    public boolean possible(int val){
-        return possibilities[val-1] != 0;
+        String str = "| ";
+
+        str += shipStr + " ";
+        return str + "|";
     }
 
     public Cell clone(){
-        return new Cell(row, col, possibilities.clone(), val, numpos);
+        return new Cell(row, col, shipStatus);
     }
 
 
